@@ -1,0 +1,105 @@
+[data-theme="dark"] {
+  --invert-icons: 1; 
+}
+
+.sidebar {
+  position: fixed; 
+  bottom: 0;       
+  top: auto;       
+  left: 0;
+  width: 100%;   
+  height: 60px;    
+  flex-direction: row;
+  justify-content: space-between; 
+  padding: 0 10px;
+  background-color: var(--sidebar-bg);
+  border-top: 1px solid var(--border-color);
+  border-right: none;
+  z-index: 1000;
+  align-items: center;
+    
+    
+
+  &__favorito, 
+    &__tema {
+        width: auto; 
+        display: inline; 
+        flex: 0 1 auto; 
+        margin-left: 20%;
+        margin-right: 20%;
+        position: relative; // IMPRESCINDIBLE para que el tooltip se posicione respecto al botón
+        cursor: pointer;
+
+      &::after {
+      content: attr(data-tooltip);
+      display: none; 
+      position: absolute;
+      bottom: 130%; 
+      left: 50%;
+      transform: translateX(-10%);
+      background-color: rgba(0, 0, 0, 0.85);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      white-space: nowrap;
+      z-index: 2000;
+      pointer-events: none; 
+      }
+
+      &:hover::after {
+      display: block;
+    }
+    }
+
+    .img {
+      width: 28px;
+      height: 28px; 
+      filter: invert(var(--invert-icons, 0));
+      margin-top: 3%;
+  }
+  
+  &__container-logo {
+    display: none; 
+  }
+
+  &__logo {
+      display: none;
+  }
+
+  @media (min-width: 768px){
+    width: 4%; 
+    justify-content: space-between;
+    background-color: var(--sidebar-bg);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+    position: sticky;
+    top: 0;
+    height: 95vh;
+    gap: 30px;
+
+    .img {
+      width: 25px;
+      height: 40px;
+      cursor: pointer;
+      transition: transform 0.2s;
+      filter: invert(var(--invert-icons, 0));
+      :hover{
+        background-color: red;
+      }
+    }
+
+    &__container-logo {
+      display: flex;
+    }
+
+    &__logo{
+      display: block;
+      width:80px ;
+    }
+  }
+  
+}

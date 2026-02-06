@@ -1,0 +1,22 @@
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(0, 0, 0, 0.1); 
+  border-left-color: rgb(225, 121, 30); 
+  border-radius: 50%; 
+  
+  animation: girar 1s linear infinite;
+  
+  display: none; 
+  margin: 20px auto;
+}
+
+@keyframes girar {
+  from {
+    transform: rotate(0deg); 
+  }
+  to {
+    transform: rotate(360deg); 
+  }
+}
