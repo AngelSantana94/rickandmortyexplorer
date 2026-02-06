@@ -4,6 +4,8 @@ import { createCatCard } from './utils/utils';
 import { initSidebar } from './utils/sidebar';
 import { deleteFav } from './utils/utils';
 
+
+
 initSidebar();
 
 const URLCATAPI = "https://api.thecatapi.com/v1/images/search?limit=10&has_breeds=1";

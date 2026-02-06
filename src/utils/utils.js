@@ -1,3 +1,4 @@
+
 export function createCatCard(element, isFavoriteView = false, favBtnOriginal = null) {
     const breedName = element.breeds?.[0]?.name || "Common Cat";
     const breedDesc = element.breeds?.[0]?.description || "No description";
@@ -18,7 +19,7 @@ export function createCatCard(element, isFavoriteView = false, favBtnOriginal = 
 
     if (isFavoriteView) {
         actionWrapper.setAttribute('data-tooltip', 'Remove from favorites');
-        actionIcon.src = "/img/delete.svg";
+        actionIcon.src = "./img/delete.svg";
         actionIcon.className = "card-overlay__icon-delete";
         
         actionIcon.onclick = () => {
@@ -26,7 +27,7 @@ export function createCatCard(element, isFavoriteView = false, favBtnOriginal = 
         };
     } else {
         actionWrapper.setAttribute('data-tooltip', 'Add to favorites');
-        actionIcon.src = "/img/favorito.svg";
+        actionIcon.src = "./img/favorito.svg";
         actionIcon.className = "card-overlay__icon-fav";
     }
     actionWrapper.appendChild(actionIcon);
@@ -35,7 +36,7 @@ export function createCatCard(element, isFavoriteView = false, favBtnOriginal = 
     infoWrapper.className = "card-overlay__tooltip-wrapper";
     infoWrapper.setAttribute('data-tooltip', `Breed: ${breedName}\n---\n${breedDesc}`);
     const infoIcon = document.createElement("img");
-    infoIcon.src = "/img/cat.svg";
+    infoIcon.src = "./img/cat.svg";
     infoIcon.className = "card-overlay__icon-breed";
     infoWrapper.appendChild(infoIcon);
 
@@ -51,7 +52,7 @@ export function createCatCard(element, isFavoriteView = false, favBtnOriginal = 
         fullScreenWrapper.setAttribute('data-tooltip', 'Full Screen');
         
         const fullIcon = document.createElement("img");
-        fullIcon.src = "/img/fullscreen.svg";
+        fullIcon.src = "./img/fullscreen.svg";
         fullIcon.className = "card-overlay__icon-fullscreen";
         
         fullIcon.onclick = () => {
