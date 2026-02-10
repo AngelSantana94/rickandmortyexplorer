@@ -1,5 +1,11 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vite';
 
-export default defineConfig({
-    base: '/catgallery/', 
-})
+export default defineConfig({ 
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: 'modern-compiler', 
+      },
+    },
+  },
+});

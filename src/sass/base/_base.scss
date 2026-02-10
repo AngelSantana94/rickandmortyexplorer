@@ -1,0 +1,28 @@
+@use '../abstracts';
+
+// -----------------------------------------------------------------------------
+// This file contains very basic styles.
+// -----------------------------------------------------------------------------
+
+html {
+  box-sizing: border-box;
+}
+
+body {
+    background-image: url("/img/background-img.jpeg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    min-height: 100vh;
+    margin: 0;
+
+    margin: 0;
+    overflow-x: hidden; 
+
+    
+    &.no-scroll {
+        height: 100vh;
+        overflow: hidden; 
+    }
+}

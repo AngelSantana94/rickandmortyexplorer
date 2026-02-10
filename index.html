@@ -8,48 +8,45 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
-    <title>cat-gallery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
+    <title>Rick&morty-explore</title>
   </head>
-  <body>
+  <body >
 
-    <aside id="sidebar" class="sidebar">
-      <div id="logo" class="sidebar__container-logo">
-        <a href="index.html">
-          <img src="/img/logo.png" alt="logo" class="sidebar__logo">
-        </a>
+    <header class="header" id="header" >
+      <h1 class="main__title"><img src="/img/title.png" alt="" ></h1>
+
+      <form action="#" id="search-form">
+        <div class="search-container">
+          <input type="text" id="searchInput" name="" id="" placeholder="Search...">
+          <button>
+            <img src="/img/lupa.svg" alt="">
+          </button>
+        </div>
+        <select name="selectEpisodes" id="selectEpisodes">
+            <option value="">Episodes</option>
+        </select>
+        <select name="selecLocations" id="selectLocations">
+          <option value="">Location</option>
+        </select>
+        
+      </form>
+
+      <div class="header-btns">
+        <div class="nav-btn" id="character">
+        <img src="/img/characters.png" alt=""  >
+        
+        </div>
+        <div class="nav-btn" id="location">
+            <img src="/img/locations.png" alt="" >
+        </div>
+        <div class="nav-btn" id="episode"  >
+            <img src="/img/episodes.png" alt="" >
+        </div>
       </div>
-
-      <div id="favoritos" class="sidebar__favorito">
-        <img src="/img/favorito.svg" alt="favorito" class="img">
-      </div>
-
-      <div id="tema" class="sidebar__tema">
-        <img src="/img/tema.svg" alt="tema" class="img">
-      </div>
-
-    </aside>
+    </header>
 
     <main class="main">
-      <h1 class="main__title"><span class="main__title01">Cat </span> Gallery</h1>
-
-      <form action="#" class="form">       
-
-        <select name="breeds" id="breedSelect" class="form__options">
-          <option value="Todas las razas">Todas las razas</option>
-        </select>
-
-        <select name="format" id="formatSelect" class="form__options">
-          <option value="Todos los formatos">Todos los formatos</option>
-          <option value="jpeg" >jpeg</option>
-          <option value="png" >png</option>
-          <option value="gif">gif</option>
-        </select>
-
-        <button class="form__button" >Buscar</button>
-      </form>
-      <p id="error-mensaje" style="display: none; color: orange;">
-          Lo sentimos, no encontramos gatos de esta raza con ese formato. ¡Prueba otra combinación!
-        </p>
       
       <div id="app" class="app-container">
         
@@ -58,18 +55,10 @@
 
       
       <div id="loader" class="spinner"></div>
-      <button class="btn-ver-mas">Ver más</button>
+      <div class="paginacion-container"></div>
       
 
     </main>
-
-    <div id="favoritosDiv" class="favoritos-overlay">
-      <div class="favoritos-overlay-open__container-closed">
-        <button id="closed"><img src="/img/close.svg" alt=""></button>
-      </div>
-      <div class="title-fav" ><p>Cajón de favoritos 🐱</p></div>
-      <div class="favoritos-overlay-open__favBoxes "></div>
-    </div>
     
     <script type="module" src="/src/main.js"></script>
   </body>

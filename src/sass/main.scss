@@ -10,14 +10,14 @@
 @use 'base/typography';
 
 // 3. Layout-related sections
+@use 'layout/footer';
+@use 'layout/header';
 @use 'layout/main';
 
 // 4. Components
 @use 'components/button';
-@use 'components/sidebar';
-@use 'components/containerFav';
-@use 'components/spiner';
-@use 'components/form';
+@use 'components/pagination';
+@use 'components/fullScreenOverlay';
 
 // 5. Pages
 @use 'pages/home';

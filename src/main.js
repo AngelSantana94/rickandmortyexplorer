@@ -1,169 +1,210 @@
 import './style.css'
-import './sass/stylesheets/main.scss'
-import { createCatCard } from './utils/utils';
-import { initSidebar } from './utils/sidebar';
-import { deleteFav } from './utils/utils';
+import './sass/main.scss'
+import { renderBoard } from './utils/renderBoard';
+import { createPagination } from './utils/createPagination';
 
+// --- 1. SELECTORES Y ESTADO ---
+const header = document.querySelector("#header");
+const appBoard = document.querySelector("#app");
+const pagination = document.querySelector(".paginacion-container");
+const searchInput = document.querySelector("#searchInput");
+const searchForm = document.querySelector("#search-form");
+const selectEpisodes = document.querySelector("#selectEpisodes");
+const selectLocations = document.querySelector("#selectLocations");
 
+let endPoint = "";
+let currentPage = 1;
+let isFetching = false;
+let activeFilters = { episode: "", location: "" };
 
-initSidebar();
+// --- 2. PETICIONES (LÓGICA CORE) ---
 
-const URLCATAPI = "https://api.thecatapi.com/v1/images/search?limit=10&has_breeds=1";
-let urlActual = "https://api.thecatapi.com/v1/images/search?limit=10&has_breeds=1";
-let app = document.querySelector("#app");
-let objetosguardados = []
+const getInfo = async () => {
+    if (isFetching || !endPoint) return;
+    isFetching = true;
 
-
-const getCatInfo = async (url = urlActual, limpiar = false) => {
-  try {
-    const response = await fetch(url, {
-      method: `GET`,
-      headers: {
-        'Content-type': 'application/json',
-        'x-api-key': 'live_b2DbcoZCrCwjxQW05vMCtgKQcgSgDd3iApiPcC3iXAQTBg7SV3XmheJ3gHByW91p',
-      }
-    });
-
-    const data = await response.json();
-    if (limpiar) app.innerHTML = "";
-
-    let mensajeError = document.querySelector("#error-mensaje");
-    if (data.length === 0) {
-      mensajeError.style.display = "block";
-      return;
-    }
-    mensajeError.style.display = "none";
-
-    // --- RENDERIZADO ---
-    data.forEach(element => {
-      let div = createCatCard(element);
-      app.appendChild(div);
-
-      let favBtn = div.querySelector('.card-overlay__icon-fav');
-
-      favBtn.addEventListener('click', () => {
-        favBtn.classList.toggle('active');
-
-        if (favBtn.classList.contains('active')) {
-          let favBoxes = document.querySelector(".favoritos-overlay-open__favBoxes");
-          
-          let divFav = createCatCard(element, true, favBtn);
-          favBoxes.appendChild(divFav);
-
-          objetosguardados.push(element);
-          localStorage.setItem("cat-card", JSON.stringify(objetosguardados));
-          console.log(`Gato ${element.id} añadido ❤️`);
-
-        } else {
-          const cleanId = element.id.replace('#', '');
-          let gatoABorrar = document.getElementById(cleanId);
-          
-          if (gatoABorrar) {
-              deleteFav(element.id, gatoABorrar, favBtn);
-              objetosguardados = objetosguardados.filter(gato => gato.id !== element.id);
-          }
-        }
-      });
-    });
-
-  } catch (error) {
-    console.error("Conexión fallida");
-  }
-};
-getCatInfo(); 
-
-const breedSelect = document.querySelector('#breedSelect');
-
-const llenarRazas = async () => {
     try {
-        const response = await fetch("https://api.thecatapi.com/v1/breeds");
-        const razas = await response.json();
-        console.log(razas)
+        appBoard.innerHTML = "<div class='loader'>Cargando...</div>";
+        const response = await fetch(`https://rickandmortyapi.com/api/${endPoint}/?page=${currentPage}`);
+        const data = await response.json();
 
-        razas.forEach(raza => {
-            const option = document.createElement('option');
-            option.value = raza.id; 
-            option.textContent = raza.name;
-            breedSelect.appendChild(option);
-        });
+        if (data.error) {
+            appBoard.innerHTML = `<p class="error">No se encontraron resultados.</p>`;
+            pagination.innerHTML = "";
+            return;
+        }
+
+        appBoard.innerHTML = "";
+        renderBoard(data, endPoint);
+
+        pagination.innerHTML = "";
+        if (data.info && data.info.pages > 1) {
+            createPagination(data.info.pages, currentPage, (newPage) => {
+                currentPage = newPage;
+                window.scrollTo(0, 0);
+                getInfo();
+            });
+        }
     } catch (error) {
-        console.error("Error cargando razas:", error);
+        console.error("Errorazo:", error);
+    } finally {
+        isFetching = false;
     }
 };
 
-llenarRazas();
+const getInfoFromUrl = async (customUrl) => {
+    if (isFetching) return;
+    isFetching = true;
+    try {
+        appBoard.innerHTML = "<div class='loader'>Buscando...</div>";
+        const response = await fetch(customUrl);
+        const data = await response.json();
+        appBoard.innerHTML = "";
 
-const btnBuscar = document.querySelector('.form__button'); 
-const formatSelect = document.querySelector('#formatSelect'); 
+        const normalizedData = Array.isArray(data) ? { results: data } : data;
 
-btnBuscar.addEventListener('click', async (e) => {
-    e.preventDefault();
-
-    const breedId = breedSelect.value;
-    const format = formatSelect.value;
-
-    let nuevaUrl = `https://api.thecatapi.com/v1/images/search?limit=10`;
-
-    if (breedId !== "Todas las razas") {
-        nuevaUrl += `&breed_ids=${breedId}`;
+        if (normalizedData.error) {
+            appBoard.innerHTML = "<p class='error'>No se encontraron resultados.</p>";
+        } else {
+            renderBoard(normalizedData, endPoint);
+        }
+        pagination.innerHTML = ""; 
+    } catch (error) {
+        console.error("Error en búsqueda externa:", error);
+    } finally {
+        isFetching = false;
     }
-    
-    if (format !== "Todos los formatos") {
-        nuevaUrl += `&mime_types=${format}`;
+};
+
+async function handleNavigationAndSearch(query, type, currentEndPoint, callback) {
+    if (type === 'search') {
+        const url = `https://rickandmortyapi.com/api/${currentEndPoint}/?name=${query}`;
+        return callback(url);
     }
 
-    if (breedId === "Todas las razas" && format === "Todos los formatos") {
-        nuevaUrl += `&has_breeds=1`;
+    if (type === 'filter-episode') activeFilters.episode = query;
+    if (type === 'filter-location') activeFilters.location = query;
+
+    if (activeFilters.episode === "" && activeFilters.location === "") {
+        return getInfo();
     }
 
-    urlActual = nuevaUrl; 
-    await getCatInfo(urlActual, true); 
-    
+    let episodeChars = null;
+    if (activeFilters.episode !== "") {
+        const res = await fetch(`https://rickandmortyapi.com/api/episode/${activeFilters.episode}`);
+        const data = await res.json();
+        episodeChars = data.characters.map(url => url.split("/").pop());
+    }
+
+    let locationChars = null;
+    if (activeFilters.location !== "") {
+        const res = await fetch(`https://rickandmortyapi.com/api/location/${activeFilters.location}`);
+        const data = await res.json();
+        locationChars = data.residents.map(url => url.split("/").pop());
+    }
+
+    let finalIds = [];
+    if (episodeChars && locationChars) {
+        finalIds = episodeChars.filter(id => locationChars.includes(id));
+    } else {
+        finalIds = episodeChars || locationChars || [];
+    }
+
+    if (finalIds.length > 0) {
+        callback(`https://rickandmortyapi.com/api/character/${finalIds.join(",")}`);
+    } else {
+        appBoard.innerHTML = "<p class='error'>No hay coincidencias en esta dimensión.</p>";
+    }
+}
+
+// --- 3. EVENTOS (LISTENERS) ---
+
+// Navegación Principal y Título
+header.addEventListener("click", (e) => {
+    const isTitleClick = e.target.closest(".main__title");
+    const btn = e.target.closest('.nav-btn');
+
+    if (isTitleClick) {
+        header.classList.add("is-intro");
+        appBoard.innerHTML = "";
+        pagination.innerHTML = "";
+        if(searchInput) searchInput.value = "";
+        return;
+    }
+
+    if (btn) {
+        header.classList.remove("is-intro");
+        endPoint = btn.id;
+        currentPage = 1;
+        activeFilters = { episode: "", location: "" };
+        if(selectEpisodes) selectEpisodes.value = "";
+        if(selectLocations) selectLocations.value = "";
+        updateFilterVisibility();
+        getInfo();
+    }
 });
 
-const dataGuardada = JSON.parse(localStorage.getItem("cat-card")) || [];
-
-if (dataGuardada.length > 0) {
-    const favBoxes = document.querySelector(".favoritos-overlay-open__favBoxes");
-    
-    objetosguardados = dataGuardada;
-
-    dataGuardada.forEach(element => {
-        const favCard = createCatCard(element, true);
+// Buscador (Submit)
+if (searchForm) {
+    searchForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const value = searchInput.value.trim();
         
-        favBoxes.appendChild(favCard);
-    });
-    
-    console.log(`✅ Se han restaurado ${dataGuardada.length} gatos favoritos.`);
-}
-
-function initPaginacion(getCatInfo, urlActual) {
-    let contadorVerMas = 0;
-    const contadorFinal = 5;
-    
-    const btnVerMas = document.querySelector(".btn-ver-mas");
-    const loader = document.querySelector("#loader");
-
-    btnVerMas?.addEventListener("click", async () => {
-        loader.style.display = "block";
-        btnVerMas.disabled = true; 
-        btnVerMas.style.opacity = "0";
-
-        contadorVerMas++;
-
-        if (contadorVerMas <= contadorFinal) {
-            await getCatInfo(urlActual, false);
-        }
-
-        loader.style.display = "none";
-        btnVerMas.disabled = false;
-        btnVerMas.style.opacity = "1";
-
-        if (contadorVerMas === contadorFinal) {
-            btnVerMas.style.display = "none";
+        if (value.length >= 2) {
+            header.classList.remove("is-intro");
+            if(selectEpisodes) selectEpisodes.value = "";
+            if(selectLocations) selectLocations.value = "";
+            activeFilters = { episode: "", location: "" };
+            if (!endPoint) endPoint = "character"; 
+            handleNavigationAndSearch(value, 'search', endPoint, getInfoFromUrl);
+        } else if (value.length === 0) {
+            getInfo();
         }
     });
 }
 
+// Filtros (Selects)
+if (selectEpisodes) {
+    selectEpisodes.addEventListener("change", (e) => {
+        handleNavigationAndSearch(e.target.value, 'filter-episode', endPoint, getInfoFromUrl);
+    });
+}
 
-initPaginacion(getCatInfo, urlActual);
+if (selectLocations) {
+    selectLocations.addEventListener("change", (e) => {
+        handleNavigationAndSearch(e.target.value, 'filter-location', endPoint, getInfoFromUrl);
+    });
+}
+
+// --- 4. INICIALIZACIÓN ---
+
+function updateFilterVisibility() {
+    const selects = document.querySelectorAll("#selectEpisodes, #selectLocations");
+    const displayValue = (endPoint === "character") ? "block" : "none";
+    selects.forEach(s => s.style.display = displayValue);
+}
+
+const populateSelects = async (type) => {
+    try {
+        const response = await fetch(`https://rickandmortyapi.com/api/${type}`);
+        const data = await response.json();
+        const ids = Array.from({ length: data.info.count }, (_, i) => i + 1);
+        const resAll = await fetch(`https://rickandmortyapi.com/api/${type}/${ids.join(",")}`);
+        const allData = await resAll.json();
+        const select = document.querySelector(type === 'episode' ? "#selectEpisodes" : "#selectLocations");
+        
+        allData.forEach(item => {
+            let option = document.createElement("option");
+            option.value = item.id;
+            option.textContent = type === 'episode' ? `${item.name} (${item.episode})` : item.name;
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error(`Error llenando select ${type}:`, error);
+    }
+};
+
+header.classList.add("is-intro");
+populateSelects('episode');
+populateSelects('location');

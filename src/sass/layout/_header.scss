@@ -1,0 +1,205 @@
+// -----------------------------------------------------------------------------
+// Variables y Animaciones
+// -----------------------------------------------------------------------------
+$rick-green: #97ce4c;
+$rick-green-alpha: rgba(151, 206, 76, 0.8);
+$portal-glow: 0 0 20px $rick-green-alpha;
+
+@keyframes levitate {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+  100% { transform: translateY(0); }
+}
+
+// -----------------------------------------------------------------------------
+// Header Principal
+// -----------------------------------------------------------------------------
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  gap: 15px;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  box-sizing: border-box;
+  z-index: 1000;
+
+  // --- ESTADO: INTRO ---
+  &.is-intro {
+    
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    justify-content: center;
+    overflow: hidden;
+
+    form { 
+    display: none !important; 
+  }
+
+    .main__title img {
+      width: clamp(250px, 80vw, 500px);
+      height: auto;
+    }
+
+    .header-btns {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 20px;
+      .nav-btn img { width: clamp(160px, 30vw, 220px) !important; }
+    }
+  }
+
+  // --- ESTADO: NORMAL (MODO DESKTOP) ---
+  &:not(.is-intro) {
+    position: sticky;
+    top: 0;
+    flex-direction: row; 
+    justify-content: space-between;
+    border-bottom: 2px solid $rick-green;
+    background: rgba(0, 0, 0, 1);
+    padding: 10px 5%;
+    height: 85px;
+
+    .main__title img {
+      width: clamp(100px, 15vw, 150px);
+    }
+
+    form {
+      display: flex; 
+    }
+
+    .header-btns {
+      gap: 15px;
+      .nav-btn img { width: clamp(70px, 10vw, 100px) !important; }
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Formulario y Buscador (Solo visible en :not(.is-intro))
+// -----------------------------------------------------------------------------
+form {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  .search-container {
+    display: flex;
+    align-items: center;
+    background: rgba(60, 62, 68, 0.9);
+    border: 2px solid $rick-green;
+    border-radius: 25px;
+    padding: 5px 15px;
+    
+    input {
+      background: transparent;
+      border: none;
+      color: white;
+      outline: none;
+      padding: 8px;
+      width: 150px;
+    }
+
+    button {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      img { width: 18px; filter: invert(1); }
+    }
+  }
+
+  select {
+    background: #3c3e44;
+    color: $rick-green;
+    border: 2px solid $rick-green;
+    border-radius: 10px;
+    padding: 8px;
+    cursor: pointer;
+    outline: none;
+    max-width: 130px; 
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    option { background: #202329; color: white; }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Botones de Navegación
+// -----------------------------------------------------------------------------
+.header-btns {
+  display: flex;
+  align-items: center;
+  transition: all 0.5s ease;
+
+  .nav-btn {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    
+    &:hover {
+      filter: drop-shadow($portal-glow);
+      animation: levitate 2s ease-in-out infinite;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// RESPONSIVE MÓVIL (MAGIA)
+// -----------------------------------------------------------------------------
+@media (max-width: 768px) {
+  
+  // Intro en móvil (ajuste de tamaño)
+  .header.is-intro {
+    .header-btns {
+      flex-direction: column;
+      gap: 15px;
+    }
+  }
+
+  // Modo App Móvil (Barra de búsqueda arriba, botones abajo)
+  .header:not(.is-intro) {
+    flex-direction: column;
+    position: relative;
+    padding: 15px;
+    height: auto;
+    position: sticky; 
+    top: 0;
+
+    .main__title { display: none; }
+
+    form {
+      flex-direction: column;
+      width: 100%;
+      .search-container { width: 100%; justify-content: space-between; input { width: 100%; } }
+      select { max-width: 100%; width: 100%; }
+    }
+
+    .header-btns {
+      position: fixed; 
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(20, 20, 20, 0.95);
+      backdrop-filter: blur(5px);
+      padding: 10px 0;
+      justify-content: space-around;
+      border-top: 2px solid $rick-green;
+      margin: 0;
+
+      .nav-btn img { width: 55px !important; }
+    }
+  }
+
+  body:has(.header:not(.is-intro)) {
+    padding-bottom: 80px; 
+  }
+}
