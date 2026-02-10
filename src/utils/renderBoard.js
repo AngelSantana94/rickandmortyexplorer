@@ -159,7 +159,7 @@ export async function renderBoard(data, endPoint){
         
         const imgCloseBtn = document.createElement("img");
         imgCloseBtn.className = "img-close-btn"
-        imgCloseBtn.src = "/img/close.svg";
+        imgCloseBtn.src = "img/close.svg";
 
         closeBtn.appendChild(imgCloseBtn);
         
